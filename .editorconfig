@@ -1,0 +1,66 @@
+﻿# EditorConfig — Zeiterfassung
+#
+# Setzt die Formatierungsregeln des Projekts so um, dass Visual Studio und
+# "dotnet format" sie von selbst befolgen.
+
+root = true
+
+# Gilt fuer alle Dateien, sofern unten nichts anderes steht.
+[*]
+charset = utf-8
+end_of_line = crlf
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+# C# und XAML: Tabulatoren der Breite 4, nur zur Einrueckung am Zeilenanfang.
+[*.{cs,xaml}]
+indent_style = tab
+indent_size = 4
+tab_width = 4
+
+# Mit Bytereihenfolge-Markierung, abweichend von der Regel oben. Visual Studio schreibt
+# diese Dateien von sich aus so, und die Doc-Kommentare darin sind deutsch: Ohne die
+# Markierung raten Werkzeuge, die keine Kodierung mitgeliefert bekommen, und lesen die
+# Umlaute falsch. Vier Dateien standen ohne sie da und sind nachgezogen worden.
+charset = utf-8-bom
+
+# Klammerstellung: Allman — die oeffnende geschweifte Klammer auf eigener Zeile.
+[*.cs]
+csharp_new_line_before_open_brace = all
+csharp_new_line_before_else = true
+csharp_new_line_before_catch = true
+csharp_new_line_before_finally = true
+
+# Geschweifte Klammern immer, auch bei einzeiligen Bloecken. Als Warnung gemeldet,
+# damit ein klammerloser Block auffaellt, statt still durchzugehen.
+csharp_prefer_braces = true:warning
+
+# Projekt- und Datendateien: Leerzeichen, Breite 2. Das ist dort die verbreitete Form,
+# und diese Dateien werden nicht nach den C#-Guidelines geschrieben.
+[*.{csproj,slnx,props,targets,xml,json}]
+indent_style = space
+indent_size = 2
+
+# Die Projektdateien tragen die Markierung ebenfalls, hier aber nicht wegen der
+# Umlaute — sie enthalten keine, ihre Kommentare sind umschrieben. Sie steht nur fest,
+# weil Visual Studio diese Dateien so erzeugt und ihr Entfernen bei jedem Speichern
+# einen Unterschied erzeugte, den niemand gewollt hat. Die Solution-Datei bleibt ohne;
+# Visual Studio schreibt sie von sich aus so.
+[*.csproj]
+charset = utf-8-bom
+
+# PowerShell-Skripte: Tabulatoren wie im C#-Code, und die Markierung zwingend. Die
+# Meldungen in scripts/release.ps1 sind deutsch und enthalten Umlaute; ohne die
+# Markierung raet Windows PowerShell die Kodierung und gibt sie falsch aus.
+[*.ps1]
+indent_style = tab
+indent_size = 4
+tab_width = 4
+charset = utf-8-bom
+
+# Markdown: Leerzeichen. Tabulatoren haben in Markdown eine eigene Bedeutung — sie
+# erzeugen Codebloecke — und wuerden die Dokumentation stellenweise zerlegen.
+[*.md]
+indent_style = space
+indent_size = 2
+trim_trailing_whitespace = false

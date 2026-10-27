@@ -1,0 +1,311 @@
+﻿<ui:FluentWindow x:Class="Zeiterfassung.App.ReportWindow"
+				 xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+				 xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+				 xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+				 xmlns:lvc="clr-namespace:LiveChartsCore.SkiaSharpView.WPF;assembly=LiveChartsCore.SkiaSharpView.WPF"
+				 Title="Auswertung"
+				 Height="760"
+				 Width="920"
+				 MinHeight="600"
+				 MinWidth="680"
+				 ExtendsContentIntoTitleBar="True"
+				 WindowBackdropType="Mica"
+				 WindowCornerPreference="Round"
+				 WindowStartupLocation="CenterOwner">
+	<Window.Resources>
+		<!-- The calendar of the date fields opens in a popup without a ground of its own; the
+			 translucent theme surface would let the window show through the day numbers. -->
+		<Style x:Key="SolidCalendarStyle"
+			   TargetType="Calendar"
+			   BasedOn="{StaticResource {x:Type Calendar}}">
+			<Setter Property="Background"
+					Value="{DynamicResource SolidBackgroundFillColorSecondaryBrush}" />
+		</Style>
+	</Window.Resources>
+
+	<Grid>
+		<Grid.RowDefinitions>
+			<RowDefinition Height="Auto" />
+			<RowDefinition Height="*" />
+		</Grid.RowDefinitions>
+
+		<ui:TitleBar Grid.Row="0"
+					 Title="Auswertung" />
+
+		<Grid Grid.Row="1"
+			  Margin="20,4,20,20">
+			<Grid.RowDefinitions>
+				<RowDefinition Height="Auto" />
+				<RowDefinition Height="Auto" />
+				<RowDefinition Height="Auto" />
+				<RowDefinition Height="*" />
+				<RowDefinition Height="Auto" />
+			</Grid.RowDefinitions>
+
+			<StackPanel Grid.Row="0"
+						Orientation="Horizontal"
+						Margin="0,0,0,14">
+				<TextBlock Text="Von"
+						   VerticalAlignment="Center"
+						   Margin="0,0,8,0" />
+				<DatePicker x:Name="FromDate"
+							CalendarStyle="{StaticResource SolidCalendarStyle}"
+							Width="140"
+							VerticalAlignment="Center"
+							SelectedDateChanged="HandleDateChanged"
+							ToolTip="Erster Tag, der mitgezählt wird. Leer heißt: ohne untere Grenze."
+							Margin="0,0,18,0" />
+				<TextBlock Text="Bis"
+						   VerticalAlignment="Center"
+						   Margin="0,0,8,0" />
+				<DatePicker x:Name="ToDate"
+							CalendarStyle="{StaticResource SolidCalendarStyle}"
+							Width="140"
+							VerticalAlignment="Center"
+							SelectedDateChanged="HandleDateChanged"
+							ToolTip="Letzter Tag, der mitgezählt wird. Leer heißt: ohne obere Grenze."
+							Margin="0,0,18,0" />
+				<ui:Button Content="Alles"
+						   Icon="{ui:SymbolIcon SelectAllOn24}"
+						   Click="HandleEverythingClick"
+						   ToolTip="Beide Datumsfelder leeren und den gesamten Bestand auswerten."
+						   Margin="0,0,8,0" />
+				<ui:Button Content="Aktualisieren"
+						   Icon="{ui:SymbolIcon ArrowClockwise24}"
+						   Click="HandleRefreshClick"
+						   ToolTip="zeiten.json erneut einlesen — etwa nachdem OneDrive den Stand des anderen Rechners gebracht hat."
+						   Margin="0,0,8,0" />
+				<ui:Button Content="Nach CSV…"
+						   Icon="{ui:SymbolIcon DocumentTable24}"
+						   Click="HandleExportClick"
+						   ToolTip="Die Einträge des gewählten Zeitraums als CSV-Datei für Excel schreiben." />
+			</StackPanel>
+
+			<StackPanel Grid.Row="1"
+						Orientation="Horizontal"
+						Margin="0,0,0,14">
+				<TextBlock Text="Module"
+						   VerticalAlignment="Center"
+						   Margin="0,0,8,0" />
+				<ui:Button x:Name="ModuleFilterButton"
+						   Content="alle"
+						   Icon="{ui:SymbolIcon Filter24}"
+						   Click="HandleModuleFilterClick"
+						   ToolTip="Wochen, Tage und Einträge auf ausgewählte Module beschränken. Ohne Auswahl zählen alle."
+						   Margin="0,0,24,0" />
+				<Popup x:Name="ModuleFilterPopup"
+					   PlacementTarget="{Binding ElementName=ModuleFilterButton}"
+					   Placement="Bottom"
+					   StaysOpen="False"
+					   AllowsTransparency="True">
+					<Border Background="{DynamicResource SolidBackgroundFillColorSecondaryBrush}"
+							BorderBrush="{DynamicResource ControlStrokeColorDefaultBrush}"
+							BorderThickness="1"
+							CornerRadius="6"
+							Padding="10">
+						<StackPanel MinWidth="220">
+							<ui:Button Content="Alle Module"
+									   Click="HandleAllModulesClick"
+									   ToolTip="Die Auswahl aufheben: alle Module zählen."
+									   Margin="0,0,0,8" />
+							<ScrollViewer MaxHeight="260"
+										  VerticalScrollBarVisibility="Auto">
+								<StackPanel x:Name="ModuleFilterList" />
+							</ScrollViewer>
+						</StackPanel>
+					</Border>
+				</Popup>
+				<TextBlock Text="Wochen und Tage"
+						   VerticalAlignment="Center"
+						   Margin="0,0,8,0" />
+				<RadioButton x:Name="PerModuleOption"
+							 Content="Je Modul"
+							 IsChecked="True"
+							 GroupName="Breakdown"
+							 Checked="HandleBreakdownChanged"
+							 ToolTip="Je Woche und Tag eine Säule pro Modul plus eine Säule für die Summe."
+							 Margin="0,0,8,0" />
+				<RadioButton x:Name="SumOnlyOption"
+							 Content="Nur Summe"
+							 GroupName="Breakdown"
+							 Checked="HandleBreakdownChanged"
+							 ToolTip="Je Woche und Tag nur eine Säule für die Summe." />
+			</StackPanel>
+
+			<StackPanel Grid.Row="2"
+						Margin="0,0,0,12">
+				<TextBlock x:Name="SummaryDisplay"
+						   FontWeight="SemiBold"
+						   FontSize="15"
+						   Text="—" />
+				<TextBlock x:Name="OpenEntryDisplay"
+						   TextWrapping="Wrap"
+						   Foreground="{DynamicResource SystemFillColorCautionBrush}"
+						   Visibility="Collapsed"
+						   Margin="0,4,0,0" />
+			</StackPanel>
+
+			<TabControl Grid.Row="3">
+				<TabItem Header="Module">
+					<Grid Margin="0,10,0,0">
+						<Grid.RowDefinitions>
+							<RowDefinition Height="300" />
+							<RowDefinition Height="*" />
+						</Grid.RowDefinitions>
+
+						<lvc:CartesianChart x:Name="ModuleChart"
+											Grid.Row="0"
+											Background="Transparent"
+											ToolTip="Die Balkenlänge zeigt das Verhältnis, die Tabelle darunter die genauen Zahlen."
+											Margin="0,0,0,12" />
+
+						<DataGrid x:Name="ModuleGrid"
+								  Grid.Row="1"
+								  AutoGenerateColumns="False"
+								  IsReadOnly="True"
+								  HeadersVisibility="Column"
+								  GridLinesVisibility="Horizontal"
+								  CanUserAddRows="False"
+								  BorderThickness="0">
+							<DataGrid.Columns>
+								<DataGridTextColumn Header="Modul"
+													Binding="{Binding Module}"
+													Width="*" />
+								<DataGridTextColumn Header="Zeit"
+													Binding="{Binding Total}"
+													Width="110" />
+								<DataGridTextColumn Header="Einträge"
+													Binding="{Binding EntryCount}"
+													Width="80" />
+								<DataGridTextColumn Header="Hinweis"
+													Binding="{Binding Hint}"
+													Width="220" />
+							</DataGrid.Columns>
+						</DataGrid>
+					</Grid>
+				</TabItem>
+
+				<TabItem Header="Wochen">
+					<Grid Margin="0,10,0,0">
+						<Grid.RowDefinitions>
+							<RowDefinition Height="Auto" />
+							<RowDefinition Height="300" />
+							<RowDefinition Height="*" />
+						</Grid.RowDefinitions>
+
+						<!-- A line of text, not a tooltip: a second tooltip would cover the chart's own. -->
+						<TextBlock Grid.Row="0"
+								   HorizontalAlignment="Right"
+								   FontSize="12"
+								   Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+								   Text="Mausrad: zoomen · gedrückte Maustaste: schieben" />
+
+						<lvc:CartesianChart x:Name="WeekChart"
+											Grid.Row="1"
+											Background="Transparent"
+											Margin="0,0,0,12" />
+
+						<DataGrid x:Name="WeekGrid"
+								  Grid.Row="2"
+								  AutoGenerateColumns="False"
+								  IsReadOnly="True"
+								  HeadersVisibility="Column"
+								  GridLinesVisibility="Horizontal"
+								  CanUserAddRows="False"
+								  BorderThickness="0">
+							<DataGrid.Columns>
+								<DataGridTextColumn Header="Kalenderwoche"
+													Binding="{Binding Period}"
+													Width="*" />
+								<DataGridTextColumn Header="Zeit"
+													Binding="{Binding Total}"
+													Width="110" />
+								<DataGridTextColumn Header="Einträge"
+													Binding="{Binding EntryCount}"
+													Width="80" />
+							</DataGrid.Columns>
+						</DataGrid>
+					</Grid>
+				</TabItem>
+
+				<TabItem Header="Tage">
+					<Grid Margin="0,10,0,0">
+						<Grid.RowDefinitions>
+							<RowDefinition Height="Auto" />
+							<RowDefinition Height="300" />
+							<RowDefinition Height="*" />
+						</Grid.RowDefinitions>
+
+						<!-- A line of text, not a tooltip: a second tooltip would cover the chart's own. -->
+						<TextBlock Grid.Row="0"
+								   HorizontalAlignment="Right"
+								   FontSize="12"
+								   Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+								   Text="Mausrad: zoomen · gedrückte Maustaste: schieben" />
+
+						<lvc:CartesianChart x:Name="DayChart"
+											Grid.Row="1"
+											Background="Transparent"
+											Margin="0,0,0,12" />
+
+						<DataGrid x:Name="DayGrid"
+								  Grid.Row="2"
+								  AutoGenerateColumns="False"
+								  IsReadOnly="True"
+								  HeadersVisibility="Column"
+								  GridLinesVisibility="Horizontal"
+								  CanUserAddRows="False"
+								  BorderThickness="0">
+							<DataGrid.Columns>
+								<DataGridTextColumn Header="Tag"
+													Binding="{Binding Period}"
+													Width="*" />
+								<DataGridTextColumn Header="Zeit"
+													Binding="{Binding Total}"
+													Width="110" />
+								<DataGridTextColumn Header="Einträge"
+													Binding="{Binding EntryCount}"
+													Width="80" />
+							</DataGrid.Columns>
+						</DataGrid>
+					</Grid>
+				</TabItem>
+
+				<TabItem Header="Einträge">
+					<DataGrid x:Name="EntryGrid"
+							  AutoGenerateColumns="False"
+							  IsReadOnly="True"
+							  HeadersVisibility="Column"
+							  GridLinesVisibility="Horizontal"
+							  CanUserAddRows="False"
+							  BorderThickness="0"
+							  Margin="0,10,0,0">
+						<DataGrid.Columns>
+							<DataGridTextColumn Header="Tag"
+												Binding="{Binding Day}"
+												Width="150" />
+							<DataGridTextColumn Header="Uhrzeit"
+												Binding="{Binding Period}"
+												Width="130" />
+							<DataGridTextColumn Header="Modul"
+												Binding="{Binding Module}"
+												Width="180" />
+							<DataGridTextColumn Header="Tätigkeit"
+												Binding="{Binding Note}"
+												Width="*" />
+							<DataGridTextColumn Header="Dauer"
+												Binding="{Binding Duration}"
+												Width="110" />
+						</DataGrid.Columns>
+					</DataGrid>
+				</TabItem>
+			</TabControl>
+
+			<TextBlock x:Name="MessageDisplay"
+					   Grid.Row="4"
+					   TextWrapping="Wrap"
+					   Visibility="Collapsed"
+					   Margin="0,12,0,0" />
+		</Grid>
+	</Grid>
+</ui:FluentWindow>

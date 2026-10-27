@@ -1,0 +1,226 @@
+﻿<ui:FluentWindow x:Class="Zeiterfassung.App.MainWindow"
+				 xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+				 xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+				 xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+				 Title="Zeiterfassung"
+				 Height="620"
+				 Width="460"
+				 MinHeight="600"
+				 MinWidth="420"
+				 ExtendsContentIntoTitleBar="True"
+				 WindowBackdropType="Mica"
+				 WindowCornerPreference="Round"
+				 WindowStartupLocation="CenterScreen"
+				 Closing="HandleWindowClosing">
+	<Grid>
+		<Grid.RowDefinitions>
+			<RowDefinition Height="Auto" />
+			<RowDefinition Height="*" />
+		</Grid.RowDefinitions>
+
+		<ui:TitleBar x:Name="WindowTitleBar"
+					 Grid.Row="0"
+					 Title="Zeiterfassung"
+					 ShowMaximize="False">
+			<!--
+				The appearance is switched here and not in the window's content: it is no
+				concern of time tracking and has no business beside play, stop and the report.
+				The title bar is the place Windows apps use for this.
+			-->
+			<ui:TitleBar.TrailingContent>
+				<StackPanel x:Name="TitleBarTools"
+							Orientation="Horizontal">
+					<ui:Button x:Name="ManageModulesButton"
+							   Icon="{ui:SymbolIcon Library24}"
+							   Appearance="Transparent"
+							   AutomationProperties.Name="Module verwalten"
+							   IsEnabled="False"
+							   Click="HandleManageModulesClick"
+							   ToolTipService.ShowOnDisabled="True"
+							   Margin="0,0,2,0" />
+
+					<ui:Button x:Name="ThemeButton"
+							   Icon="{ui:SymbolIcon DarkTheme24}"
+							   Appearance="Transparent"
+							   AutomationProperties.Name="Darstellung"
+							   ToolTip="Darstellung wählen: dem System folgen, hell oder dunkel."
+							   Click="HandleThemeClick"
+							   Margin="0,0,4,0">
+					<ui:Button.ContextMenu>
+						<ContextMenu x:Name="ThemeMenu">
+							<MenuItem x:Name="ThemeSystemItem"
+									  Header="Wie das System"
+									  IsCheckable="True"
+									  Click="HandleThemeChoice"
+									  Tag="System" />
+							<MenuItem x:Name="ThemeLightItem"
+									  Header="Immer hell"
+									  IsCheckable="True"
+									  Click="HandleThemeChoice"
+									  Tag="Light" />
+							<MenuItem x:Name="ThemeDarkItem"
+									  Header="Immer dunkel"
+									  IsCheckable="True"
+									  Click="HandleThemeChoice"
+									  Tag="Dark" />
+						</ContextMenu>
+					</ui:Button.ContextMenu>
+					</ui:Button>
+				</StackPanel>
+			</ui:TitleBar.TrailingContent>
+		</ui:TitleBar>
+
+		<Grid x:Name="MainGrid"
+			  Grid.Row="1"
+			  Margin="20,4,20,20">
+			<Grid.RowDefinitions>
+				<RowDefinition Height="Auto" />
+				<RowDefinition Height="Auto" />
+				<RowDefinition Height="Auto" />
+				<RowDefinition Height="*" />
+				<RowDefinition Height="Auto" />
+			</Grid.RowDefinitions>
+
+			<TextBlock x:Name="ModuleLabel"
+					   Grid.Row="0"
+					   Text="Modul"
+					   FontWeight="Medium"
+					   Margin="0,0,0,6" />
+
+			<ComboBox x:Name="ModuleSelection"
+					  Grid.Row="1"
+					  DisplayMemberPath="Name"
+					  SelectionChanged="HandleModuleSelectionChanged"
+					  ToolTipService.ShowOnDisabled="True"
+					  Margin="0,0,0,10" />
+
+			<ui:TextBox x:Name="ActivityText"
+						Grid.Row="2"
+						PlaceholderText="Tätigkeit (darf leer bleiben)"
+						ToolTipService.ShowOnDisabled="True" />
+
+			<!--
+				The middle takes up the free space and stays centred within it. That keeps the
+				message box at the bottom from drifting away when the window is pulled taller,
+				and the compact view keeps the same arrangement, only without the neighbours.
+			-->
+			<StackPanel Grid.Row="3"
+						VerticalAlignment="Center"
+						HorizontalAlignment="Center">
+				<TextBlock x:Name="ElapsedDisplay"
+						   Text="00:00:00"
+						   FontSize="46"
+						   FontFamily="Consolas"
+						   HorizontalAlignment="Center"
+						   Margin="0,0,0,18" />
+
+				<StackPanel Orientation="Horizontal"
+							HorizontalAlignment="Center">
+					<ui:Button x:Name="PlayButton"
+							   AutomationProperties.Name="Play"
+							   Appearance="Primary"
+							   Icon="{ui:SymbolIcon Play24, Filled=True}"
+							   Width="64"
+							   Height="64"
+							   CornerRadius="32"
+							   HorizontalContentAlignment="Center"
+							   IsEnabled="False"
+							   Click="HandlePlayClick"
+							   ToolTipService.ShowOnDisabled="True"
+							   Margin="0,0,16,0" />
+					<ui:Button x:Name="StopButton"
+							   AutomationProperties.Name="Stop"
+							   Icon="{ui:SymbolIcon Stop24, Filled=True}"
+							   Width="64"
+							   Height="64"
+							   CornerRadius="32"
+							   HorizontalContentAlignment="Center"
+							   IsEnabled="False"
+							   Click="HandleStopClick"
+							   ToolTipService.ShowOnDisabled="True" />
+					<ui:Button x:Name="ExpandButton"
+							   AutomationProperties.Name="Große Ansicht"
+							   Icon="{ui:SymbolIcon ArrowMaximize24}"
+							   Width="44"
+							   Height="44"
+							   CornerRadius="22"
+							   HorizontalContentAlignment="Center"
+							   VerticalAlignment="Center"
+							   ToolTip="Zurück zur großen Ansicht"
+							   Visibility="Collapsed"
+							   Click="HandleExpandClick"
+							   Margin="16,0,0,0" />
+				</StackPanel>
+
+				<StackPanel x:Name="SecondaryButtons"
+							Orientation="Horizontal"
+							HorizontalAlignment="Center"
+							Margin="0,22,0,0">
+					<ui:Button x:Name="ReportButton"
+							   Content="Auswertung…"
+							   Icon="{ui:SymbolIcon DataHistogram24}"
+							   IsEnabled="False"
+							   Click="HandleReportClick"
+							   ToolTipService.ShowOnDisabled="True"
+							   Margin="0,0,10,0" />
+					<ui:Button x:Name="CompactButton"
+							   Content="Kompakt"
+							   Icon="{ui:SymbolIcon ArrowMinimize24}"
+							   IsEnabled="False"
+							   Click="HandleCompactClick"
+							   ToolTipService.ShowOnDisabled="True" />
+				</StackPanel>
+			</StackPanel>
+
+			<!--
+				The message area per OBERFLAECHE.md, section 5. Built by hand and not the
+				library's InfoBar: its template draws only headline and message side by side
+				and passes over the content, so the folder button would find no room in it.
+				The colours come from the theme as a DynamicResource and follow the switch
+				between light and dark by themselves.
+			-->
+			<Border x:Name="StatusPanel"
+					Grid.Row="4"
+					BorderThickness="1"
+					CornerRadius="8"
+					Padding="14,12"
+					Background="{DynamicResource CardBackground}"
+					BorderBrush="{DynamicResource CardBorderBrush}"
+					Margin="0,16,0,0">
+				<Grid>
+					<Grid.ColumnDefinitions>
+						<ColumnDefinition Width="Auto" />
+						<ColumnDefinition Width="*" />
+					</Grid.ColumnDefinitions>
+
+					<ui:SymbolIcon x:Name="StatusIcon"
+								   Grid.Column="0"
+								   Symbol="Info24"
+								   FontSize="18"
+								   VerticalAlignment="Top"
+								   Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+								   Margin="0,1,12,0" />
+
+					<StackPanel Grid.Column="1">
+						<TextBlock x:Name="StatusHeadline"
+								   Text="Bereit"
+								   FontWeight="SemiBold"
+								   TextWrapping="Wrap"
+								   Margin="0,0,0,3" />
+						<TextBlock x:Name="StatusDisplay"
+								   TextWrapping="Wrap"
+								   Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
+						<ui:Button x:Name="ChooseFolderButton"
+								   Content="Ordner wählen…"
+								   Icon="{ui:SymbolIcon FolderOpen24}"
+								   HorizontalAlignment="Left"
+								   Visibility="Collapsed"
+								   Click="HandleChooseFolderClick"
+								   ToolTip="Den Ordner wählen, in dem die Datendateien liegen."
+								   Margin="0,12,0,2" />
+					</StackPanel>
+				</Grid>
+			</Border>
+		</Grid>
+	</Grid>
+</ui:FluentWindow>

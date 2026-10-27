@@ -1,0 +1,19 @@
+﻿<Application x:Class="Zeiterfassung.App.App"
+			 xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+			 xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+			 xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+			 xmlns:local="clr-namespace:Zeiterfassung.App">
+	<Application.Resources>
+		<ResourceDictionary>
+			<ResourceDictionary.MergedDictionaries>
+				<!--
+					The colour scheme entered here is only the starting value. Which one
+					actually applies is decided at startup by the stored choice, and with
+					"system" by the Windows setting; see AppearanceSetup.ApplyTheme.
+				-->
+				<ui:ThemesDictionary Theme="Light" />
+				<ui:ControlsDictionary />
+			</ResourceDictionary.MergedDictionaries>
+		</ResourceDictionary>
+	</Application.Resources>
+</Application>

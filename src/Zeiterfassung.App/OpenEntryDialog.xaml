@@ -1,0 +1,97 @@
+﻿<ui:FluentWindow x:Class="Zeiterfassung.App.OpenEntryDialog"
+				 xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+				 xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+				 xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+				 Title="Offene Sitzung gefunden"
+				 Height="390"
+				 Width="470"
+				 ResizeMode="NoResize"
+				 ExtendsContentIntoTitleBar="True"
+				 WindowBackdropType="Mica"
+				 WindowCornerPreference="Round"
+				 WindowStartupLocation="CenterOwner"
+				 ShowInTaskbar="False">
+	<Grid>
+		<Grid.RowDefinitions>
+			<RowDefinition Height="Auto" />
+			<RowDefinition Height="*" />
+		</Grid.RowDefinitions>
+
+		<ui:TitleBar Grid.Row="0"
+					 Title="Offene Sitzung gefunden"
+					 ShowMaximize="False"
+					 ShowMinimize="False" />
+
+		<Grid Grid.Row="1"
+			  Margin="20,4,20,20">
+			<Grid.RowDefinitions>
+				<RowDefinition Height="Auto" />
+				<RowDefinition Height="Auto" />
+				<RowDefinition Height="Auto" />
+				<RowDefinition Height="Auto" />
+				<RowDefinition Height="Auto" />
+				<RowDefinition Height="Auto" />
+				<RowDefinition Height="*" />
+				<RowDefinition Height="Auto" />
+			</Grid.RowDefinitions>
+
+			<StackPanel Grid.Row="0"
+						Orientation="Horizontal"
+						Margin="0,0,0,10">
+				<ui:SymbolIcon Symbol="Clock24"
+							   FontSize="18"
+							   VerticalAlignment="Center"
+							   Foreground="{DynamicResource SystemFillColorCautionBrush}"
+							   Margin="0,0,10,0" />
+				<TextBlock Text="Es liegt eine Sitzung ohne Ende vor."
+						   FontWeight="SemiBold"
+						   VerticalAlignment="Center" />
+			</StackPanel>
+
+			<TextBlock x:Name="EntryDescription"
+					   Grid.Row="1"
+					   TextWrapping="Wrap"
+					   Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+					   Margin="0,0,0,16" />
+
+			<TextBlock Grid.Row="2"
+					   Text="Ende (Datum und Uhrzeit)"
+					   FontWeight="Medium"
+					   Margin="0,0,0,6" />
+
+			<ui:TextBox x:Name="EndInput"
+						Grid.Row="3"
+						TextChanged="HandleEndInputChanged"
+						ToolTip="Es gilt die Ortszeit dieses Rechners; eine Zeitzone wird nicht angegeben."
+						Margin="0,0,0,6" />
+
+			<TextBlock x:Name="InputHint"
+					   Grid.Row="4"
+					   TextWrapping="Wrap"
+					   Foreground="{DynamicResource SystemFillColorCriticalBrush}" />
+
+			<TextBlock Grid.Row="5"
+					   TextWrapping="Wrap"
+					   Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+					   Text="Weiterlaufen zählt ab dem gespeicherten Start weiter, als wäre nie gestoppt worden."
+					   Margin="0,14,0,0" />
+
+			<StackPanel Grid.Row="7"
+						Orientation="Horizontal"
+						HorizontalAlignment="Right"
+						Margin="0,16,0,0">
+				<ui:Button x:Name="CompleteButton"
+						   Content="Abschließen"
+						   Appearance="Primary"
+						   MinWidth="130"
+						   Click="HandleCompleteClick"
+						   ToolTipService.ShowOnDisabled="True"
+						   Margin="0,0,10,0" />
+				<ui:Button Content="Weiterlaufen"
+						   MinWidth="130"
+						   Click="HandleResumeClick"
+						   ToolTip="Die Sitzung ab dem gespeicherten Start weiterzählen lassen." />
+			</StackPanel>
+		</Grid>
+	</Grid>
+</ui:FluentWindow>

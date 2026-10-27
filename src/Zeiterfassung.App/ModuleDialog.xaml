@@ -1,0 +1,139 @@
+﻿<ui:FluentWindow x:Class="Zeiterfassung.App.ModuleDialog"
+				 xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+				 xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+				 xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+				 Title="Module"
+				 Height="560"
+				 Width="620"
+				 MinHeight="460"
+				 MinWidth="560"
+				 ExtendsContentIntoTitleBar="True"
+				 WindowBackdropType="Mica"
+				 WindowCornerPreference="Round"
+				 WindowStartupLocation="CenterOwner">
+	<Grid>
+		<Grid.RowDefinitions>
+			<RowDefinition Height="Auto" />
+			<RowDefinition Height="*" />
+		</Grid.RowDefinitions>
+
+		<ui:TitleBar Grid.Row="0"
+					 Title="Module"
+					 ShowMaximize="False"
+					 ShowMinimize="False" />
+
+		<Grid Grid.Row="1"
+			  Margin="20,4,20,20">
+			<Grid.RowDefinitions>
+				<RowDefinition Height="Auto" />
+				<RowDefinition Height="*" />
+				<RowDefinition Height="Auto" />
+				<RowDefinition Height="Auto" />
+				<RowDefinition Height="Auto" />
+				<RowDefinition Height="Auto" />
+			</Grid.RowDefinitions>
+
+			<TextBlock Grid.Row="0"
+					   TextWrapping="Wrap"
+					   Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+					   Text="Ein Modul, auf das noch keine Zeit gebucht ist, lässt sich umbenennen und löschen. Sobald Zeit darauf läuft, kann es nur noch deaktiviert werden — es verschwindet dann aus der Auswahl, seine Zeit zählt in der Auswertung aber weiter mit."
+					   Margin="0,0,0,14" />
+
+			<DataGrid x:Name="ModuleGrid"
+					  Grid.Row="1"
+					  AutoGenerateColumns="False"
+					  IsReadOnly="True"
+					  HeadersVisibility="Column"
+					  GridLinesVisibility="Horizontal"
+					  CanUserAddRows="False"
+					  SelectionMode="Single"
+					  SelectionChanged="HandleSelectionChanged"
+					  BorderThickness="0">
+				<DataGrid.Columns>
+					<DataGridTextColumn Header="Modul"
+										Binding="{Binding Name}"
+										Width="*" />
+					<DataGridTextColumn Header="Zustand"
+										Binding="{Binding State}"
+										Width="130" />
+					<DataGridTextColumn Header="Verwendung"
+										Binding="{Binding Usage}"
+										Width="230" />
+				</DataGrid.Columns>
+			</DataGrid>
+
+			<TextBlock Grid.Row="2"
+					   Text="Name"
+					   FontWeight="Medium"
+					   Margin="0,16,0,6" />
+
+			<ui:TextBox x:Name="NameInput"
+						Grid.Row="3"
+						PlaceholderText="Name des Moduls"
+						TextChanged="HandleNameChanged"
+						ToolTip="Der Name, unter dem das Modul in der Auswahl erscheint und in jeden Zeiteintrag geschrieben wird." />
+
+			<StackPanel Grid.Row="4"
+						Orientation="Horizontal"
+						Margin="0,12,0,0">
+				<ui:Button x:Name="AddButton"
+						   Content="Anlegen"
+						   Icon="{ui:SymbolIcon Add24}"
+						   Appearance="Primary"
+						   IsEnabled="False"
+						   Click="HandleAddClick"
+						   ToolTipService.ShowOnDisabled="True"
+						   Margin="0,0,8,0" />
+				<ui:Button x:Name="RenameButton"
+						   Content="Umbenennen"
+						   Icon="{ui:SymbolIcon Rename24}"
+						   IsEnabled="False"
+						   Click="HandleRenameClick"
+						   ToolTipService.ShowOnDisabled="True"
+						   Margin="0,0,8,0" />
+				<ui:Button x:Name="DeleteButton"
+						   Content="Löschen"
+						   Icon="{ui:SymbolIcon Delete24}"
+						   IsEnabled="False"
+						   Click="HandleDeleteClick"
+						   ToolTipService.ShowOnDisabled="True"
+						   Margin="0,0,20,0" />
+				<ui:Button x:Name="ToggleButton"
+						   Content="Deaktivieren"
+						   Icon="{ui:SymbolIcon EyeOff24}"
+						   IsEnabled="False"
+						   Click="HandleToggleClick"
+						   ToolTipService.ShowOnDisabled="True" />
+			</StackPanel>
+
+			<Border x:Name="MessagePanel"
+					Grid.Row="5"
+					BorderThickness="1"
+					CornerRadius="8"
+					Padding="12,10"
+					Background="{DynamicResource CardBackground}"
+					BorderBrush="{DynamicResource CardBorderBrush}"
+					Visibility="Collapsed"
+					Margin="0,14,0,0">
+				<Grid>
+					<Grid.ColumnDefinitions>
+						<ColumnDefinition Width="Auto" />
+						<ColumnDefinition Width="*" />
+					</Grid.ColumnDefinitions>
+
+					<ui:SymbolIcon x:Name="MessageIcon"
+								   Grid.Column="0"
+								   Symbol="Warning24"
+								   FontSize="16"
+								   VerticalAlignment="Top"
+								   Foreground="{DynamicResource SystemFillColorCautionBrush}"
+								   Margin="0,1,10,0" />
+
+					<TextBlock x:Name="MessageDisplay"
+							   Grid.Column="1"
+							   TextWrapping="Wrap" />
+				</Grid>
+			</Border>
+		</Grid>
+	</Grid>
+</ui:FluentWindow>

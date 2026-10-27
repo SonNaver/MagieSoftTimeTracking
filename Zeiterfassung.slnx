@@ -1,0 +1,9 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/Zeiterfassung.App/Zeiterfassung.App.csproj" />
+    <Project Path="src/Zeiterfassung.Core/Zeiterfassung.Core.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/Zeiterfassung.Core.Tests/Zeiterfassung.Core.Tests.csproj" />
+  </Folder>
+</Solution>

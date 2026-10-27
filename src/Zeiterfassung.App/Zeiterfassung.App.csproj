@@ -1,0 +1,48 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <ProjectReference Include="..\Zeiterfassung.Core\Zeiterfassung.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!--
+      Draws the charts of the report. WPF knows lines and rectangles, but no axis and no
+      bar.
+    -->
+    <PackageReference Include="LiveChartsCore.SkiaSharpView.WPF" Version="2.0.5" />
+
+    <!--
+      Dresses the user interface in the Fluent styling of Windows 11 and supplies the
+      switch between light and dark appearance. The standard WPF controls date from 2006
+      and know neither the one nor the other.
+    -->
+    <PackageReference Include="WPF-UI" Version="4.3.0" />
+  </ItemGroup>
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <!-- The release version; it shows in the file properties of the exe. -->
+    <Version>1.0.0</Version>
+    <!--
+      The Windows version is stated explicitly, rather than just "net10.0-windows" (which
+      silently means Windows 7). SkiaSharp.Views.WPF, which sits below the chart package,
+      ships its .NET builds only for windows10.0.19041; without this entry NuGet falls
+      back to the .NET Framework build along with OpenTK 3. Do not shorten it.
+    -->
+    <TargetFramework>net10.0-windows10.0.19041.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UseWPF>true</UseWPF>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+
+    <!--
+      Turns off the processor's protection against return-oriented attacks (CET, shadow
+      stack) for this program. Necessary because .NET switches it on by itself as of
+      version 9, which makes the Windows file and folder dialogs crash as soon as a
+      shell extension unfit for CET is loaded into the process — and only on some
+      machines. Do not tidy this line away.
+    -->
+    <CETCompat>false</CETCompat>
+  </PropertyGroup>
+
+</Project>
